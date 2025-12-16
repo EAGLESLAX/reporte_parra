@@ -1,0 +1,15 @@
+<button onclick="enviar()">Enviar</button>
+
+<script>
+function enviar() {
+  fetch("https://script.google.com/macros/s/AKfycbzMaF7aS7Xd5tF_AIHNtkTuOR5KR9bZhx4GQDYMHJdrbqpqmAV89ldIoEXqNyR9y1mc/exec", {
+    method: "POST",
+    body: JSON.stringify({ nombre: "Fer" }),
+    headers: {
+      "Content-Type": "application/json"
+    }
+  })
+  .then(r => r.text())
+  .then(res => alert(res));
+}
+</script>
