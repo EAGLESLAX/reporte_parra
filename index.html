@@ -1,264 +1,348 @@
 <!DOCTYPE html>
-<html>
+<html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <base target="_top">
-  <title>Procesador de Ventas (.xlsx)</title>
+<meta charset="UTF-8">
+<title>Procesador de Ventas</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- SheetJS -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- SheetJS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 
-  <style>
-    body { font-family: Inter, Roboto, Arial; background:#f5f7fb; padding:22px; color:#0f1724; }
-    .card { max-width:1100px; margin:0 auto; background:white; padding:20px; border-radius:12px; box-shadow:0 6px 20px rgba(16,24,40,0.06); }
-    h2 { margin:0 0 6px 0; font-weight:700; }
-    p.lead { margin:6px 0 18px 0; color:#475569; }
-    .row { display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
-    input[type=file] { padding:8px; border-radius:8px; border:1px solid #e6eef6; background:#fff; }
-    .status { margin-top:12px; color:#0b74de; font-weight:600; }
-    .error { color:#b91c1c; font-weight:700; }
-    .controls { margin-top:16px; display:flex; gap:12px; align-items:center; flex-wrap:wrap; }
-    select { padding:8px 10px; border-radius:8px; border:1px solid #dbe7f8; background:white; min-width:180px; }
-    .table-wrap { margin-top:18px; overflow:auto; border-radius:8px; }
-    table { width:100%; border-collapse:collapse; min-width:720px; }
-    th { text-align:left; background:#0f1724; color:white; padding:10px 12px; position:sticky; top:0; }
-    td { padding:10px 12px; border-bottom:1px solid #eef3fb; color:#102a43; }
-    tr:nth-child(even) td { background:#fbfdff; }
-    tr:hover td { background:#e6f0ff; }
-    .small { font-size:13px; color:#475569; }
-    .download-link { display:inline-block; margin-top:12px; text-decoration:none; background:#0f1724; color:white; padding:8px 12px; border-radius:8px; }
-  </style>
+<style>
+:root{
+  --bg:#f4f7fb;
+  --card:#ffffff;
+  --primary:#0f172a;
+  --accent:#2563eb;
+  --success:#16a34a;
+  --error:#dc2626;
+  --muted:#64748b;
+  --border:#e5e7eb;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family:Inter,Segoe UI,Roboto,Arial;
+  color:#0f172a;
+}
+
+.container{
+  max-width:1200px;
+  margin:40px auto;
+  padding:0 20px;
+}
+
+.card{
+  background:var(--card);
+  border-radius:16px;
+  box-shadow:0 10px 30px rgba(15,23,42,.08);
+  padding:28px;
+}
+
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:16px;
+}
+
+.header h1{
+  margin:0;
+  font-size:26px;
+}
+
+.header p{
+  margin:6px 0 0 0;
+  color:var(--muted);
+}
+
+.actions{
+  display:flex;
+  gap:12px;
+}
+
+.btn{
+  border:none;
+  border-radius:10px;
+  padding:10px 18px;
+  font-weight:600;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.btn-primary{
+  background:var(--accent);
+  color:#fff;
+}
+.btn-primary:hover{opacity:.9}
+
+.btn-outline{
+  background:#fff;
+  border:1px solid var(--border);
+}
+
+.upload{
+  margin-top:24px;
+  padding:20px;
+  border:2px dashed var(--border);
+  border-radius:14px;
+  text-align:center;
+}
+
+.upload input{
+  margin-top:10px;
+}
+
+.status{
+  margin-top:14px;
+  font-weight:600;
+  color:var(--accent);
+}
+
+.status.error{color:var(--error)}
+.status.success{color:var(--success)}
+
+.controls{
+  margin-top:20px;
+  display:none;
+  gap:14px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+select{
+  padding:8px 12px;
+  border-radius:10px;
+  border:1px solid var(--border);
+}
+
+.counter{
+  margin-left:auto;
+  color:var(--muted);
+}
+
+.table-wrap{
+  margin-top:22px;
+  overflow:auto;
+  border-radius:12px;
+  display:none;
+}
+
+table{
+  width:100%;
+  border-collapse:collapse;
+  min-width:720px;
+}
+
+th{
+  background:var(--primary);
+  color:#fff;
+  padding:12px;
+  text-align:left;
+  position:sticky;
+  top:0;
+}
+
+td{
+  padding:10px 12px;
+  border-bottom:1px solid var(--border);
+}
+
+tr:nth-child(even) td{background:#fafafa}
+tr:hover td{background:#eef2ff}
+
+.highlight td{
+  background:#fff7cc !important;
+}
+
+.footer{
+  margin-top:20px;
+  text-align:right;
+}
+
+.download{
+  display:inline-block;
+  background:var(--primary);
+  color:white;
+  padding:10px 16px;
+  border-radius:10px;
+  text-decoration:none;
+}
+</style>
 </head>
-<body>
-  <div class="card">
-    <h2>Procesador de Ventas (.xlsx)</h2>
-    <p class="lead">Selecciona un archivo Excel. Se procesará automáticamente, verás el resumen y se descargará el archivo generado.</p>
 
-    <div class="row">
-      <input id="fileInput" type="file" accept=".xlsx" />
-      <div id="status" class="status">Esperando archivo...</div>
+<body>
+<div class="container">
+  <div class="card">
+
+    <div class="header">
+      <div>
+        <h1>Procesador de Ventas</h1>
+        <p>Carga un archivo Excel, genera el resumen y descarga el reporte.</p>
+      </div>
+      <div class="actions">
+        <button class="btn btn-outline" onclick="location.reload()">Limpiar</button>
+      </div>
     </div>
 
-    <div class="controls" id="controls" style="display:none;">
-      <label class="small">Filtrar por Tipo Tarjeta:</label>
+    <div class="upload">
+      <strong>Selecciona archivo .xlsx</strong><br>
+      <input type="file" id="fileInput" accept=".xlsx">
+      <div id="status" class="status">Esperando archivo…</div>
+    </div>
+
+    <div class="controls" id="controls">
+      <label>Filtrar Tipo Tarjeta:</label>
       <select id="filtroTipo" onchange="aplicarFiltro()">
         <option value="__TODAS__">Todas</option>
       </select>
-      <label class="small" id="contador" style="margin-left:auto;"></label>
+      <div class="counter" id="contador"></div>
     </div>
 
-    <div class="table-wrap" id="tablaWrap" style="display:none;">
+    <div class="table-wrap" id="tablaWrap">
       <div id="tablaContainer"></div>
     </div>
 
-    <div id="extras"></div>
+    <div class="footer" id="footer"></div>
+
   </div>
+</div>
 
-  <script>
-    const fileInput = document.getElementById('fileInput');
-    const status = document.getElementById('status');
-    const tablaWrap = document.getElementById('tablaWrap');
-    const tablaContainer = document.getElementById('tablaContainer');
-    const controls = document.getElementById('controls');
-    const filtroTipo = document.getElementById('filtroTipo');
-    const contador = document.getElementById('contador');
-    const extras = document.getElementById('extras');
+<script>
+const GAS_URL = "https://script.google.com/macros/s/TU_ID/exec";
 
-    let datosOriginales = null; // array de objetos
-    let encabezados = null;
+const fileInput = document.getElementById('fileInput');
+const status = document.getElementById('status');
+const tablaWrap = document.getElementById('tablaWrap');
+const tablaContainer = document.getElementById('tablaContainer');
+const controls = document.getElementById('controls');
+const filtroTipo = document.getElementById('filtroTipo');
+const contador = document.getElementById('contador');
+const footer = document.getElementById('footer');
 
-    fileInput.addEventListener('change', () => {
-      const file = fileInput.files[0];
-      if (!file) return;
-      status.textContent = 'Leyendo archivo...';
-      tablaWrap.style.display = 'none';
-      controls.style.display = 'none';
-      extras.innerHTML = '';
+let encabezados = [];
+let datosOriginales = [];
 
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        try {
-          const data = new Uint8Array(e.target.result);
-          const workbook = XLSX.read(data, { type: 'array' });
-          const sheetName = workbook.SheetNames[0];
-          const sheet = workbook.Sheets[sheetName];
+fileInput.addEventListener('change', () => {
+  const file = fileInput.files[0];
+  if(!file) return;
 
-          // Obtener AOA (array de arrays) para mantener orden de encabezados exacto
-          const aoa = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
-          if (!aoa || aoa.length < 2) {
-            status.classList.add('error');
-            status.textContent = 'El archivo no tiene datos o encabezados inválidos.';
-            return;
-          }
+  status.textContent = "Leyendo archivo…";
+  status.className = "status";
 
-          const headers = aoa[0].map(h => String(h).trim());
-          const rowsAoa = aoa.slice(1);
+  const reader = new FileReader();
+  reader.onload = e => {
+    const data = new Uint8Array(e.target.result);
+    const wb = XLSX.read(data,{type:'array'});
+    const sh = wb.Sheets[wb.SheetNames[0]];
+    const aoa = XLSX.utils.sheet_to_json(sh,{header:1,defval:""});
 
-          // Construir array de objetos (filas) y filas como arreglo (para enviar)
-          const rowsObjects = rowsAoa.map(r => {
-            const obj = {};
-            headers.forEach((h, i) => obj[h] = r[i] !== undefined ? r[i] : "");
-            return obj;
-          });
-
-          // Enviar al servidor: payload con headers y filas (objetos)
-          status.textContent = 'Enviando datos al servidor...';
-          google.script.run
-            .withSuccessHandler(onProcesado)
-            .withFailureHandler(err => {
-              status.classList.add('error');
-              status.textContent = 'Error servidor: ' + (err.message || err.toString());
-            })
-            .procesarJSON({ headers: headers, rows: rowsObjects });
-        } catch (err) {
-          status.classList.add('error');
-          status.textContent = 'Error leyendo Excel: ' + err.message;
-        }
-      };
-      reader.readAsArrayBuffer(file);
+    encabezados = aoa[0].map(h=>String(h).trim());
+    const rows = aoa.slice(1).map(r=>{
+      const o={};
+      encabezados.forEach((h,i)=>o[h]=r[i]);
+      return o;
     });
 
-    function onProcesado(res) {
-      if (res.error) {
-        status.classList.add('error');
-        status.textContent = 'Error servidor: ' + res.error;
-        return;
-      }
+    enviarServidor(encabezados, rows);
+  };
+  reader.readAsArrayBuffer(file);
+});
 
-      encabezados = res.tabla[0];
-      const tabla = res.tabla; // array de arrays
-      datosOriginales = tablaToObjects(tabla); // convertimos a objetos para filtro
+function enviarServidor(headers, rows){
+  status.textContent = "Procesando…";
 
-      renderTabla(tabla);
-      prepararFiltro(datosOriginales);
-
-      // Descargar desde base64 recibido
-      if (res.fileBase64) {
-        status.textContent = 'Proceso terminado. Iniciando descarga...';
-        const bytes = base64ToUint8Array(res.fileBase64);
-        const blob = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob);
-        a.download = res.filename || "REPORTE_RESUMEN.xlsx";
-        a.click();
-        URL.revokeObjectURL(a.href);
-      } else {
-        status.textContent = 'Proceso terminado.';
-      }
-
-      tablaWrap.style.display = 'block';
-      controls.style.display = 'flex';
-      status.classList.remove('error');
-      status.textContent = 'Proceso completado ✔';
-      contador.textContent = (datosOriginales.length) + ' filas en resumen';
-    }
-
-    // tabla es array de arrays (primer fila encabezados)
-function renderTabla(tabla) {
-  if (!tabla || tabla.length == 0) return;
-  const headers = tabla[0];
-  const rows = tabla.slice(1);
-
-  // identificar índice de la columna "Movimientos"
-  const idxMov = headers.indexOf("Movimientos");
-
-  let html = '<table><thead><tr>';
-  headers.forEach(h => html += `<th>${escapeHtml(h)}</th>`);
-  html += '</tr></thead><tbody>';
-
-  rows.forEach(r => {
-    // obtener movimientos
-    let mov = 0;
-    if (idxMov >= 0) {
-      mov = parseFloat(String(r[idxMov]).replace(/,/g, "")) || 0;
-    }
-
-    // si movimientos > 0 → fondo amarillo suave
-    const style = mov > 0 ? ' style="background:#fff9c4;"' : '';
-
-    html += `<tr${style}>`;
-    r.forEach(cell => html += `<td>${escapeHtml(String(cell))}</td>`);
-    html += '</tr>';
+  fetch(GAS_URL,{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({headers,rows})
+  })
+  .then(r=>r.json())
+  .then(onProcesado)
+  .catch(err=>{
+    status.textContent = err;
+    status.classList.add("error");
   });
-
-  html += '</tbody></table>';
-  tablaContainer.innerHTML = html;
 }
 
-    function prepararFiltro(objRows) {
-      // objRows: array of objects from tabla
-      const tipos = new Set();
-      objRows.forEach(r => {
-        const t = (r['Tipo Tarjeta'] || '').toString().trim();
-        if (t) tipos.add(t);
-      });
+function onProcesado(res){
+  if(res.error){
+    status.textContent = res.error;
+    status.classList.add("error");
+    return;
+  }
 
-      filtroTipo.innerHTML = '<option value="__TODAS__">Todas</option>';
-      Array.from(tipos).sort().forEach(t => {
-        const o = document.createElement('option');
-        o.value = t; o.textContent = t;
-        filtroTipo.appendChild(o);
-      });
-    }
+  status.textContent = "Proceso completado ✔";
+  status.classList.add("success");
 
-    function aplicarFiltro() {
-      const valor = filtroTipo.value;
-      if (!datosOriginales) return;
-      if (valor === '__TODAS__') {
-        renderTabla(objectArrayToAoa([encabezados].concat(datosOriginalesToAoa(datosOriginales))));
-        contador.textContent = datosOriginales.length + ' filas';
-        return;
-      }
-      const filtradas = datosOriginales.filter(r => (r['Tipo Tarjeta']||'').toString().trim() === valor);
-      renderTabla(objectArrayToAoa([encabezados].concat(datosOriginalesToAoa(filtradas))));
-      contador.textContent = filtradas.length + ' filas (filtrado)';
-    }
+  renderTabla(res.tabla);
+  prepararFiltro(res.tabla);
+  descargar(res);
 
-    // util: convierte tabla array->array de objetos
-    function tablaToObjects(tabla) {
-      if (!tabla || tabla.length < 1) return [];
-      const hdr = tabla[0];
-      const rows = tabla.slice(1);
-      return rows.map(r => {
-        const obj = {};
-        hdr.forEach((h,i) => obj[h] = r[i]);
-        return obj;
-      });
-    }
+  tablaWrap.style.display="block";
+  controls.style.display="flex";
+}
 
-    // util: objetos -> AOA (rows arrays) excluding header
-    function datosOriginalesToAoa(objArr) {
-      return objArr.map(o => encabezados.map(h => o[h] !== undefined ? o[h] : ""));
-    }
+function renderTabla(tabla){
+  const headers = tabla[0];
+  const rows = tabla.slice(1);
+  const idxMov = headers.indexOf("Movimientos");
 
-    // util: crea AOA con encabezados + rows arrays
-    function objectArrayToAoa(arrays) {
-      // if first element is headers row or array
-      if (Array.isArray(arrays[0])) return arrays;
-      return [];
-    }
+  let html="<table><thead><tr>";
+  headers.forEach(h=>html+=`<th>${h}</th>`);
+  html+="</tr></thead><tbody>";
 
-    function escapeHtml(s) {
-      return s
-        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-        .replace(/"/g,'&quot;').replace(/'/g,'&#039;');
-    }
+  rows.forEach(r=>{
+    const mov = idxMov>=0 ? Number(r[idxMov])||0 : 0;
+    html+=`<tr class="${mov>0?'highlight':''}">`;
+    r.forEach(c=>html+=`<td>${c}</td>`);
+    html+="</tr>";
+  });
 
-    function base64ToUint8Array(base64) {
-      const raw = atob(base64);
-      const arr = new Uint8Array(raw.length);
-      for (let i = 0; i < raw.length; i++) arr[i] = raw.charCodeAt(i);
-      return arr;
-    }
+  html+="</tbody></table>";
+  tablaContainer.innerHTML=html;
+  datosOriginales = rows.map(r=>{
+    const o={}; headers.forEach((h,i)=>o[h]=r[i]); return o;
+  });
+  contador.textContent = rows.length+" filas";
+}
 
-    // helpers for conversion used in filtro rendering
-    function objectArrayToAoaFull(tableObjs) {
-      // not used: kept for extension
-    }
+function prepararFiltro(tabla){
+  const tipos = new Set();
+  tabla.slice(1).forEach(r=>{
+    const i = tabla[0].indexOf("Tipo Tarjeta");
+    if(i>=0 && r[i]) tipos.add(r[i]);
+  });
 
-    function datosOriginalesToAoa(rowsObjs) {
-      return rowsObjs.map(o => encabezados.map(h => o[h] !== undefined ? o[h] : ""));
-    }
-  </script>
+  filtroTipo.innerHTML='<option value="__TODAS__">Todas</option>';
+  [...tipos].sort().forEach(t=>{
+    const o=document.createElement("option");
+    o.value=t;o.textContent=t;
+    filtroTipo.appendChild(o);
+  });
+}
+
+function aplicarFiltro(){
+  const v=filtroTipo.value;
+  if(v==="__TODAS__"){renderTabla([encabezados].concat(datosOriginales.map(o=>encabezados.map(h=>o[h]))));return;}
+  const f=datosOriginales.filter(o=>o["Tipo Tarjeta"]===v);
+  renderTabla([encabezados].concat(f.map(o=>encabezados.map(h=>o[h]))));
+}
+
+function descargar(res){
+  const bytes=Uint8Array.from(atob(res.fileBase64),c=>c.charCodeAt(0));
+  const blob=new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download=res.filename;
+  a.click();
+  URL.revokeObjectURL(a.href);
+}
+</script>
 </body>
 </html>
+
