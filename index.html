@@ -1,348 +1,59 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Procesador de Ventas</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<!-- SheetJS -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-
-<style>
-:root{
-  --bg:#f4f7fb;
-  --card:#ffffff;
-  --primary:#0f172a;
-  --accent:#2563eb;
-  --success:#16a34a;
-  --error:#dc2626;
-  --muted:#64748b;
-  --border:#e5e7eb;
-}
-
-*{box-sizing:border-box}
-
-body{
-  margin:0;
-  background:var(--bg);
-  font-family:Inter,Segoe UI,Roboto,Arial;
-  color:#0f172a;
-}
-
-.container{
-  max-width:1200px;
-  margin:40px auto;
-  padding:0 20px;
-}
-
-.card{
-  background:var(--card);
-  border-radius:16px;
-  box-shadow:0 10px 30px rgba(15,23,42,.08);
-  padding:28px;
-}
-
-.header{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  flex-wrap:wrap;
-  gap:16px;
-}
-
-.header h1{
-  margin:0;
-  font-size:26px;
-}
-
-.header p{
-  margin:6px 0 0 0;
-  color:var(--muted);
-}
-
-.actions{
-  display:flex;
-  gap:12px;
-}
-
-.btn{
-  border:none;
-  border-radius:10px;
-  padding:10px 18px;
-  font-weight:600;
-  cursor:pointer;
-  transition:.2s;
-}
-
-.btn-primary{
-  background:var(--accent);
-  color:#fff;
-}
-.btn-primary:hover{opacity:.9}
-
-.btn-outline{
-  background:#fff;
-  border:1px solid var(--border);
-}
-
-.upload{
-  margin-top:24px;
-  padding:20px;
-  border:2px dashed var(--border);
-  border-radius:14px;
-  text-align:center;
-}
-
-.upload input{
-  margin-top:10px;
-}
-
-.status{
-  margin-top:14px;
-  font-weight:600;
-  color:var(--accent);
-}
-
-.status.error{color:var(--error)}
-.status.success{color:var(--success)}
-
-.controls{
-  margin-top:20px;
-  display:none;
-  gap:14px;
-  align-items:center;
-  flex-wrap:wrap;
-}
-
-select{
-  padding:8px 12px;
-  border-radius:10px;
-  border:1px solid var(--border);
-}
-
-.counter{
-  margin-left:auto;
-  color:var(--muted);
-}
-
-.table-wrap{
-  margin-top:22px;
-  overflow:auto;
-  border-radius:12px;
-  display:none;
-}
-
-table{
-  width:100%;
-  border-collapse:collapse;
-  min-width:720px;
-}
-
-th{
-  background:var(--primary);
-  color:#fff;
-  padding:12px;
-  text-align:left;
-  position:sticky;
-  top:0;
-}
-
-td{
-  padding:10px 12px;
-  border-bottom:1px solid var(--border);
-}
-
-tr:nth-child(even) td{background:#fafafa}
-tr:hover td{background:#eef2ff}
-
-.highlight td{
-  background:#fff7cc !important;
-}
-
-.footer{
-  margin-top:20px;
-  text-align:right;
-}
-
-.download{
-  display:inline-block;
-  background:var(--primary);
-  color:white;
-  padding:10px 16px;
-  border-radius:10px;
-  text-decoration:none;
-}
-</style>
+  <meta charset="UTF-8">
+  <title>Subir Reporte</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .card {
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,.15);
+      width: 350px;
+    }
+    h2 {
+      margin-top: 0;
+      text-align: center;
+    }
+    button {
+      width: 100%;
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      background: #2563eb;
+      color: white;
+      font-size: 16px;
+      cursor: pointer;
+    }
+    input {
+      width: 100%;
+      margin-bottom: 15px;
+    }
+  </style>
 </head>
-
 <body>
-<div class="container">
-  <div class="card">
 
-    <div class="header">
-      <div>
-        <h1>Procesador de Ventas</h1>
-        <p>Carga un archivo Excel, genera el resumen y descarga el reporte.</p>
-      </div>
-      <div class="actions">
-        <button class="btn btn-outline" onclick="location.reload()">Limpiar</button>
-      </div>
-    </div>
+<div class="card">
+  <h2>Subir archivo</h2>
 
-    <div class="upload">
-      <strong>Selecciona archivo .xlsx</strong><br>
-      <input type="file" id="fileInput" accept=".xlsx">
-      <div id="status" class="status">Esperando archivo…</div>
-    </div>
-
-    <div class="controls" id="controls">
-      <label>Filtrar Tipo Tarjeta:</label>
-      <select id="filtroTipo" onchange="aplicarFiltro()">
-        <option value="__TODAS__">Todas</option>
-      </select>
-      <div class="counter" id="contador"></div>
-    </div>
-
-    <div class="table-wrap" id="tablaWrap">
-      <div id="tablaContainer"></div>
-    </div>
-
-    <div class="footer" id="footer"></div>
-
-  </div>
+  <form
+    action="https://script.google.com/macros/s/AKfycbz0unxFR4crDlOjz5zPiAlkjvIpXIXMl4KKFFX0YUCNXKrTWR1kwoBPPRC8JsEu28Sz/exec"
+    method="POST"
+    enctype="multipart/form-data"
+    target="_blank"
+  >
+    <input type="file" name="file" required>
+    <button type="submit">Subir</button>
+  </form>
 </div>
 
-<script>
-const GAS_URL = "https://script.google.com/macros/s/AKfycbz0unxFR4crDlOjz5zPiAlkjvIpXIXMl4KKFFX0YUCNXKrTWR1kwoBPPRC8JsEu28Sz/exec";
-
-const fileInput = document.getElementById('fileInput');
-const status = document.getElementById('status');
-const tablaWrap = document.getElementById('tablaWrap');
-const tablaContainer = document.getElementById('tablaContainer');
-const controls = document.getElementById('controls');
-const filtroTipo = document.getElementById('filtroTipo');
-const contador = document.getElementById('contador');
-const footer = document.getElementById('footer');
-
-let encabezados = [];
-let datosOriginales = [];
-
-fileInput.addEventListener('change', () => {
-  const file = fileInput.files[0];
-  if(!file) return;
-
-  status.textContent = "Leyendo archivo…";
-  status.className = "status";
-
-  const reader = new FileReader();
-  reader.onload = e => {
-    const data = new Uint8Array(e.target.result);
-    const wb = XLSX.read(data,{type:'array'});
-    const sh = wb.Sheets[wb.SheetNames[0]];
-    const aoa = XLSX.utils.sheet_to_json(sh,{header:1,defval:""});
-
-    encabezados = aoa[0].map(h=>String(h).trim());
-    const rows = aoa.slice(1).map(r=>{
-      const o={};
-      encabezados.forEach((h,i)=>o[h]=r[i]);
-      return o;
-    });
-
-    enviarServidor(encabezados, rows);
-  };
-  reader.readAsArrayBuffer(file);
-});
-
-function enviarServidor(headers, rows){
-  status.textContent = "Procesando…";
-
-  fetch(GAS_URL,{
-    method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({headers,rows})
-  })
-  .then(r=>r.json())
-  .then(onProcesado)
-  .catch(err=>{
-    status.textContent = err;
-    status.classList.add("error");
-  });
-}
-
-function onProcesado(res){
-  if(res.error){
-    status.textContent = res.error;
-    status.classList.add("error");
-    return;
-  }
-
-  status.textContent = "Proceso completado ✔";
-  status.classList.add("success");
-
-  renderTabla(res.tabla);
-  prepararFiltro(res.tabla);
-  descargar(res);
-
-  tablaWrap.style.display="block";
-  controls.style.display="flex";
-}
-
-function renderTabla(tabla){
-  const headers = tabla[0];
-  const rows = tabla.slice(1);
-  const idxMov = headers.indexOf("Movimientos");
-
-  let html="<table><thead><tr>";
-  headers.forEach(h=>html+=`<th>${h}</th>`);
-  html+="</tr></thead><tbody>";
-
-  rows.forEach(r=>{
-    const mov = idxMov>=0 ? Number(r[idxMov])||0 : 0;
-    html+=`<tr class="${mov>0?'highlight':''}">`;
-    r.forEach(c=>html+=`<td>${c}</td>`);
-    html+="</tr>";
-  });
-
-  html+="</tbody></table>";
-  tablaContainer.innerHTML=html;
-  datosOriginales = rows.map(r=>{
-    const o={}; headers.forEach((h,i)=>o[h]=r[i]); return o;
-  });
-  contador.textContent = rows.length+" filas";
-}
-
-function prepararFiltro(tabla){
-  const tipos = new Set();
-  tabla.slice(1).forEach(r=>{
-    const i = tabla[0].indexOf("Tipo Tarjeta");
-    if(i>=0 && r[i]) tipos.add(r[i]);
-  });
-
-  filtroTipo.innerHTML='<option value="__TODAS__">Todas</option>';
-  [...tipos].sort().forEach(t=>{
-    const o=document.createElement("option");
-    o.value=t;o.textContent=t;
-    filtroTipo.appendChild(o);
-  });
-}
-
-function aplicarFiltro(){
-  const v=filtroTipo.value;
-  if(v==="__TODAS__"){renderTabla([encabezados].concat(datosOriginales.map(o=>encabezados.map(h=>o[h]))));return;}
-  const f=datosOriginales.filter(o=>o["Tipo Tarjeta"]===v);
-  renderTabla([encabezados].concat(f.map(o=>encabezados.map(h=>o[h]))));
-}
-
-function descargar(res){
-  const bytes=Uint8Array.from(atob(res.fileBase64),c=>c.charCodeAt(0));
-  const blob=new Blob([bytes],{type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-  const a=document.createElement("a");
-  a.href=URL.createObjectURL(blob);
-  a.download=res.filename;
-  a.click();
-  URL.revokeObjectURL(a.href);
-}
-</script>
 </body>
 </html>
-
